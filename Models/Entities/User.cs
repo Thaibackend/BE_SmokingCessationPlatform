@@ -1,5 +1,6 @@
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using SmokingQuitSupportAPI.Models.Enums;
 
 namespace SmokingQuitSupportAPI.Models.Entities
 {
@@ -24,31 +25,33 @@ namespace SmokingQuitSupportAPI.Models.Entities
         public string? FullName { get; set; }
         
         [StringLength(20)]
-        public string Role { get; set; } = UserRole.User.ToString();
+        public string Role { get; set; } = "User";
         
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
-        // Existing navigation properties
-        public virtual ICollection<Activity> Activities { get; set; } = new List<Activity>();
-        public virtual ICollection<Post> Posts { get; set; } = new List<Post>();
-        public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
-        public virtual ICollection<Appointment> MemberAppointments { get; set; } = new List<Appointment>();
-        public virtual ICollection<Appointment> CoachAppointments { get; set; } = new List<Appointment>();
-        public virtual ICollection<Plan> MemberPlans { get; set; } = new List<Plan>();
-        public virtual ICollection<Plan> CoachPlans { get; set; } = new List<Plan>();
-        public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
-
-        // New navigation properties
-        public virtual ICollection<UserAchievement> UserAchievements { get; set; } = new List<UserAchievement>();
-        public virtual ICollection<SmokingStatus> SmokingStatuses { get; set; } = new List<SmokingStatus>();
-        public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
-        public virtual ICollection<DailyTask> DailyTasks { get; set; } = new List<DailyTask>();
-        public virtual ICollection<CoachApplication> CoachApplications { get; set; } = new List<CoachApplication>();
+        // Navigation properties
+        public ICollection<Activity> Activities { get; set; } = new List<Activity>();
+        public ICollection<Post> Posts { get; set; } = new List<Post>();
+        public ICollection<Comment> Comments { get; set; } = new List<Comment>();
+        public ICollection<Appointment> MemberAppointments { get; set; } = new List<Appointment>();
+        public ICollection<Appointment> CoachAppointments { get; set; } = new List<Appointment>();
+        public ICollection<Plan> MemberPlans { get; set; } = new List<Plan>();
+        public ICollection<Plan> CoachPlans { get; set; } = new List<Plan>();
+        public ICollection<Order> Orders { get; set; } = new List<Order>();
+        public ICollection<UserAchievement> UserAchievements { get; set; } = new List<UserAchievement>();
+        public ICollection<SmokingStatus> SmokingStatuses { get; set; } = new List<SmokingStatus>();
+        public ICollection<Notification> Notifications { get; set; } = new List<Notification>();
+        public ICollection<DailyTask> DailyTasks { get; set; } = new List<DailyTask>();
+        public ICollection<CoachApplication> CoachApplications { get; set; } = new List<CoachApplication>();
+        public ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
+        public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
+        public ICollection<CoachCommission> CoachCommissions { get; set; } = new List<CoachCommission>();
+        public ICollection<Package> AssignedPackages { get; set; } = new List<Package>();
 
         // Helper method để check role
-        public bool IsAdmin() => Role == UserRole.Admin.ToString();
-        public bool IsCoach() => Role == UserRole.Coach.ToString() || IsAdmin();
-        public bool IsUser() => Role == UserRole.User.ToString();
+        public bool IsAdmin() => Role == "Admin";
+        public bool IsCoach() => Role == "Coach" || IsAdmin();
+        public bool IsUser() => Role == "User";
     }
 } 
