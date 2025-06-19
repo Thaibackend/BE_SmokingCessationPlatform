@@ -1,0 +1,277 @@
+# ===================================
+# SMOKING QUIT SUPPORT API - PACKAGE SYSTEM TESTING
+# ===================================
+# 📦 Features: Basic/Premium Packages, Auto Quit Plans, Coach Support
+# 🔗 Base URL: https://localhost:7000/api
+# 🔐 Authentication: Bearer Token required for most endpoints
+
+@baseUrl = https://localhost:7000/api
+@bearerToken = YOUR_JWT_TOKEN_HERE
+
+# ===================================
+# 1. AUTHENTICATION (Lấy Bearer Token)
+# ===================================
+
+### 1.1 Đăng ký account mới (sẽ tự động có gói Basic)
+POST {{baseUrl}}/Auth/register
+Content-Type: application/json
+
+{
+  "username": "user_test_package",
+  "email": "test.package@example.com", 
+  "password": "Test123@",
+  "fullName": "Test Package User"
+}
+
+### 1.2 Đăng nhập để lấy token
+POST {{baseUrl}}/Auth/login
+Content-Type: application/json
+
+{
+  "email": "test.package@example.com",
+  "password": "Test123@"
+}
+
+# ===================================
+# 2. PACKAGE MANAGEMENT (Basic Features)
+# ===================================
+
+### 2.1 Lấy thông tin gói hiện tại của user
+GET {{baseUrl}}/Package/my-package
+Authorization: Bearer {{bearerToken}}
+
+### 2.2 Kiểm tra quyền truy cập Premium
+GET {{baseUrl}}/Package/premium-access
+Authorization: Bearer {{bearerToken}}
+
+### 2.3 Xem tính năng có sẵn theo gói hiện tại
+GET {{baseUrl}}/Package/available-features
+Authorization: Bearer {{bearerToken}}
+
+# ===================================
+# 3. AUTO QUIT PLAN SUGGESTION (Basic Feature)
+# ===================================
+
+### 3.1 Tạo thông tin hút thuốc trước (cần thiết cho auto suggestion)
+POST {{baseUrl}}/SmokingStatus
+Authorization: Bearer {{bearerToken}}
+Content-Type: application/json
+
+{
+  "cigarettesPerDay": 15,
+  "yearsOfSmoking": 5,
+  "brand": "Marlboro",
+  "status": "Active",
+  "pricePerPack": 25000,
+  "quitAttempts": 2,
+  "lastQuitDate": "2024-01-01T00:00:00Z",
+  "averageCostPerDay": 18750
+}
+
+### 3.2 Lấy đề xuất kế hoạch cai thuốc tự động
+GET {{baseUrl}}/Package/suggested-quit-plan
+Authorization: Bearer {{bearerToken}}
+
+# ===================================
+# 4. PACKAGE UPGRADE (Basic to Premium)
+# ===================================
+
+### 4.1 Upgrade lên gói Premium (30 ngày)
+POST {{baseUrl}}/Package/upgrade
+Authorization: Bearer {{bearerToken}}
+Content-Type: application/json
+
+{
+  "newPackageType": "PREMIUM",
+  "price": 500000,
+  "durationDays": 30,
+  "preferredCoachId": 1
+}
+
+### 4.2 Xác nhận upgrade thành công
+GET {{baseUrl}}/Package/my-package
+Authorization: Bearer {{bearerToken}}
+
+# ===================================
+# 5. PREMIUM FEATURES - STAGE MANAGEMENT
+# ===================================
+
+### 5.1 Xem giai đoạn cai thuốc hiện tại
+GET {{baseUrl}}/Premium/stage/current
+Authorization: Bearer {{bearerToken}}
+
+### 5.2 Cập nhật tiến độ giai đoạn hiện tại
+PUT {{baseUrl}}/Premium/stage/update-progress
+Authorization: Bearer {{bearerToken}}
+Content-Type: application/json
+
+{
+  "progressPercentage": 25,
+  "userNotes": "Đã giảm từ 15 điếu xuống 10 điếu/ngày",
+  "cigarettesSmoked": 10,
+  "cravingLevel": 6,
+  "stressLevel": 7,
+  "supportLevel": 8,
+  "challenges": "Cơn thèm thuốc vào buổi tối",
+  "achievements": "Không hút thuốc trong giờ làm việc"
+}
+
+### 5.3 Lấy lịch sử tất cả giai đoạn
+GET {{baseUrl}}/Premium/stage/history
+Authorization: Bearer {{bearerToken}}
+
+### 5.4 Chuyển sang giai đoạn tiếp theo (khi đã hoàn thành giai đoạn hiện tại)
+POST {{baseUrl}}/Premium/stage/advance
+Authorization: Bearer {{bearerToken}}
+Content-Type: application/json
+
+"INITIAL_QUIT"
+
+# ===================================
+# 6. PREMIUM FEATURES - COACH CHAT
+# ===================================
+
+### 6.1 Gửi tin nhắn cho coach
+POST {{baseUrl}}/Premium/chat/send
+Authorization: Bearer {{bearerToken}}
+Content-Type: application/json
+
+{
+  "receiverId": 1,
+  "content": "Chào coach, em đang gặp khó khăn với cơn thèm thuốc vào buổi tối. Coach có thể tư vấn giúp em không?",
+  "messageType": "TEXT"
+}
+
+### 6.2 Xem lịch sử chat với coach
+GET {{baseUrl}}/Premium/chat/history/1?pageNumber=1&pageSize=20
+Authorization: Bearer {{bearerToken}}
+
+### 6.3 Đánh dấu tin nhắn đã đọc
+POST {{baseUrl}}/Premium/chat/mark-read
+Authorization: Bearer {{bearerToken}}
+Content-Type: application/json
+
+[1, 2, 3]
+
+# ===================================
+# 7. PREMIUM FEATURES - MEETING BOOKING
+# ===================================
+
+### 7.1 Book meeting với coach
+POST {{baseUrl}}/Premium/meeting/book
+Authorization: Bearer {{bearerToken}}
+Content-Type: application/json
+
+{
+  "preferredDate": "2024-12-25T10:00:00Z",
+  "meetingType": "INITIAL_CONSULTATION",
+  "notes": "Tư vấn kế hoạch cai thuốc cá nhân hóa"
+}
+
+### 7.2 Xem danh sách meetings của mình
+GET {{baseUrl}}/Premium/meeting/my-meetings
+Authorization: Bearer {{bearerToken}}
+
+# ===================================
+# 8. BRINKMAN INDEX (Available for all packages)
+# ===================================
+
+### 8.1 Xem chỉ số Brinkman Index
+GET {{baseUrl}}/SmokingStatus/brinkman-index
+Authorization: Bearer {{bearerToken}}
+
+### 8.2 Xem thống kê Brinkman Index so với cộng đồng
+GET {{baseUrl}}/SmokingStatus/brinkman-statistics
+Authorization: Bearer {{bearerToken}}
+
+# ===================================
+# 9. TEST CASE SCENARIOS
+# ===================================
+
+# SCENARIO 1: User Basic muốn dùng premium features
+### 9.1 Thử gửi chat khi chưa có Premium (sẽ bị từ chối)
+POST {{baseUrl}}/Premium/chat/send
+Authorization: Bearer {{bearerToken}}
+Content-Type: application/json
+
+{
+  "receiverId": 1,
+  "content": "Test message from Basic user",
+  "messageType": "TEXT"
+}
+
+# SCENARIO 2: Different Brinkman Index levels
+### 9.2 Test với nguy cơ thấp (Brinkman < 100)
+POST {{baseUrl}}/SmokingStatus
+Authorization: Bearer {{bearerToken}}
+Content-Type: application/json
+
+{
+  "cigarettesPerDay": 5,
+  "yearsOfSmoking": 2,
+  "brand": "Test Light",
+  "status": "Active",
+  "pricePerPack": 20000,
+  "quitAttempts": 1,
+  "lastQuitDate": "2024-01-01T00:00:00Z",
+  "averageCostPerDay": 6667
+}
+
+### 9.3 Test với nguy cơ cao (Brinkman > 200)
+POST {{baseUrl}}/SmokingStatus
+Authorization: Bearer {{bearerToken}}
+Content-Type: application/json
+
+{
+  "cigarettesPerDay": 25,
+  "yearsOfSmoking": 15,
+  "brand": "Test Heavy",
+  "status": "Active",
+  "pricePerPack": 30000,
+  "quitAttempts": 5,
+  "lastQuitDate": "2024-01-01T00:00:00Z",
+  "averageCostPerDay": 37500
+}
+
+# ===================================
+# 10. ERROR TESTING
+# ===================================
+
+### 10.1 Thử upgrade với dữ liệu không hợp lệ
+POST {{baseUrl}}/Package/upgrade
+Authorization: Bearer {{bearerToken}}
+Content-Type: application/json
+
+{
+  "newPackageType": "INVALID_PACKAGE",
+  "price": -100,
+  "durationDays": 0
+}
+
+### 10.2 Thử truy cập Premium features mà không có token
+GET {{baseUrl}}/Premium/stage/current
+
+### 10.3 Thử book meeting với ngày trong quá khứ
+POST {{baseUrl}}/Premium/meeting/book
+Authorization: Bearer {{bearerToken}}
+Content-Type: application/json
+
+{
+  "preferredDate": "2020-01-01T10:00:00Z",
+  "meetingType": "FOLLOW_UP",
+  "notes": "Test past date"
+}
+
+# ===================================
+# 📋 TESTING CHECKLIST
+# ===================================
+# ✅ Basic package tự động tạo khi đăng ký
+# ✅ Auto quit plan suggestion hoạt động
+# ✅ Premium upgrade thành công
+# ✅ Stage management cho Premium users
+# ✅ Chat với coach (Premium only)
+# ✅ Meeting booking (Premium only)
+# ✅ Permission checking đúng
+# ✅ Error handling phù hợp
+# ✅ Brinkman Index calculation
+# ✅ Different risk levels generate different plans 

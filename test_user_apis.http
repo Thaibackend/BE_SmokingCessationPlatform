@@ -1,0 +1,286 @@
+### Test User APIs - Smoking Quit Support
+### Base URL: https://localhost:7000 
+### Chú ý: Thay thế {{token}} bằng JWT token thực sau khi đăng nhập
+
+#########################################
+### 1. AUTHENTICATION APIs
+#########################################
+
+### 1.1. Đăng ký tài khoản mới
+POST https://localhost:7000/api/Auth/register
+Content-Type: application/json
+
+{
+  "username": "testuser123",
+  "email": "testuser@example.com",
+  "password": "Test123!@#",
+  "fullName": "Test User"
+}
+
+### 1.2. Đăng nhập
+POST https://localhost:7000/api/Auth/login
+Content-Type: application/json
+
+{
+  "email": "testuser@example.com",
+  "password": "Test123!@#"
+}
+
+### Response sẽ có dạng:
+# {
+#   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+#   "user": { ... }
+# }
+### Copy token từ response để dùng cho các request tiếp theo
+
+#########################################
+### 2. SMOKING STATUS APIs (MỚI - BRINKMAN INDEX)
+#########################################
+
+### 2.1. Tạo thông tin hút thuốc (với YearsOfSmoking mới)
+POST https://localhost:7000/api/SmokingStatus
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "quitDate": "2024-01-01T00:00:00Z",
+  "cigarettesPerDay": 15,
+  "yearsOfSmoking": 10,
+  "costPerPack": 50000,
+  "cigarettesPerPack": 20
+}
+
+### 2.2. Lấy thông tin smoking status của tôi
+GET https://localhost:7000/api/SmokingStatus/my-status
+Authorization: Bearer {{token}}
+
+### 2.3. ⭐ Lấy chỉ số Brinkman Index với biểu đồ sóng (TÍNH NĂNG MỚI)
+GET https://localhost:7000/api/SmokingStatus/brinkman-index
+Authorization: Bearer {{token}}
+
+### 2.4. ⭐ Lấy thống kê Brinkman Index tổng quan (TÍNH NĂNG MỚI)
+GET https://localhost:7000/api/SmokingStatus/brinkman-statistics
+
+### 2.5. Cập nhật thống kê tiến trình
+POST https://localhost:7000/api/SmokingStatus/update-statistics
+Authorization: Bearer {{token}}
+
+### 2.6. Xem bảng xếp hạng tiền tiết kiệm
+GET https://localhost:7000/api/SmokingStatus/leaderboard/money-saved?take=10
+
+### 2.7. Xem bảng xếp hạng ngày không hút thuốc
+GET https://localhost:7000/api/SmokingStatus/leaderboard/smoke-free-days?take=10
+
+### 2.8. Thống kê tổng quan hệ thống
+GET https://localhost:7000/api/SmokingStatus/overall-statistics
+
+#########################################
+### 3. PROGRESS APIs
+#########################################
+
+### 3.1. Lấy tiến độ của tôi
+GET https://localhost:7000/api/Progress/my-progress
+Authorization: Bearer {{token}}
+
+### 3.2. Tạo bản ghi tiến độ hàng ngày
+POST https://localhost:7000/api/Progress
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "date": "2024-01-15T00:00:00Z",
+  "healthScore": 85,
+  "notes": "Hôm nay cảm thấy khỏe hơn",
+  "mood": 4,
+  "cravingLevel": 2,
+  "weight": 65.5,
+  "exerciseMinutes": 30,
+  "sleepHours": 8.0
+}
+
+### 3.3. Lấy tiến độ theo khoảng thời gian
+GET https://localhost:7000/api/Progress/date-range?startDate=2024-01-01&endDate=2024-01-31
+Authorization: Bearer {{token}}
+
+### 3.4. Lấy thống kê tiến độ
+GET https://localhost:7000/api/Progress/statistics
+Authorization: Bearer {{token}}
+
+#########################################
+### 4. QUIT PLAN APIs
+#########################################
+
+### 4.1. Tạo kế hoạch cai thuốc
+POST https://localhost:7000/api/QuitPlan
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Kế hoạch cai thuốc 30 ngày",
+  "description": "Kế hoạch cai thuốc từ từ trong 30 ngày",
+  "startDate": "2024-01-01T00:00:00Z",
+  "endDate": "2024-01-31T00:00:00Z",
+  "targetCigarettesPerDay": 0,
+  "strategies": ["Giảm dần số điếu", "Tập thể dục", "Tránh stress"]
+}
+
+### 4.2. Lấy kế hoạch của tôi
+GET https://localhost:7000/api/QuitPlan/my-plans
+Authorization: Bearer {{token}}
+
+### 4.3. Cập nhật kế hoạch
+PUT https://localhost:7000/api/QuitPlan/{planId}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Kế hoạch cai thuốc cập nhật",
+  "description": "Mô tả mới",
+  "targetCigarettesPerDay": 5
+}
+
+#########################################
+### 5. ACHIEVEMENT APIs
+#########################################
+
+### 5.1. Lấy thành tựu của tôi
+GET https://localhost:7000/api/Achievement/my-achievements
+Authorization: Bearer {{token}}
+
+### 5.2. Lấy tất cả thành tựu có thể đạt được
+GET https://localhost:7000/api/Achievement/available
+
+### 5.3. Kiểm tra thành tựu mới
+POST https://localhost:7000/api/Achievement/check-new-achievements
+Authorization: Bearer {{token}}
+
+#########################################
+### 6. COMMUNITY POST APIs
+#########################################
+
+### 6.1. Lấy bài viết cộng đồng
+GET https://localhost:7000/api/CommunityPost?page=1&pageSize=10
+
+### 6.2. Tạo bài viết mới
+POST https://localhost:7000/api/CommunityPost
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Chia sẻ kinh nghiệm cai thuốc",
+  "content": "Hôm nay là ngày thứ 10 tôi cai thuốc...",
+  "category": "EXPERIENCE"
+}
+
+### 6.3. Like bài viết
+POST https://localhost:7000/api/CommunityPost/{postId}/like
+Authorization: Bearer {{token}}
+
+### 6.4. Comment bài viết
+POST https://localhost:7000/api/CommunityPost/{postId}/comment
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "content": "Chúc mừng bạn! Tôi cũng đang cố gắng cai thuốc."
+}
+
+#########################################
+### 7. DASHBOARD APIs
+#########################################
+
+### 7.1. Lấy dashboard tổng quan
+GET https://localhost:7000/api/Dashboard/overview
+Authorization: Bearer {{token}}
+
+### 7.2. Thống kê theo tháng
+GET https://localhost:7000/api/Dashboard/monthly-stats?year=2024&month=1
+Authorization: Bearer {{token}}
+
+### 7.3. Báo cáo chi tiết
+GET https://localhost:7000/api/Dashboard/detailed-report?startDate=2024-01-01&endDate=2024-01-31
+Authorization: Bearer {{token}}
+
+#########################################
+### 8. TEST CASES CHO BRINKMAN INDEX
+#########################################
+
+### Test Case 1: Nguy cơ thấp (Brinkman Index < 100)
+POST https://localhost:7000/api/SmokingStatus
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "quitDate": "2024-01-01T00:00:00Z",
+  "cigarettesPerDay": 5,
+  "yearsOfSmoking": 15,
+  "costPerPack": 50000,
+  "cigarettesPerPack": 20
+}
+
+### Test Case 2: Nguy cơ trung bình (Brinkman Index 100-200)
+POST https://localhost:7000/api/SmokingStatus
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "quitDate": "2024-01-01T00:00:00Z",
+  "cigarettesPerDay": 10,
+  "yearsOfSmoking": 15,
+  "costPerPack": 50000,
+  "cigarettesPerPack": 20
+}
+
+### Test Case 3: Nguy cơ cao (Brinkman Index > 200)
+POST https://localhost:7000/api/SmokingStatus
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "quitDate": "2024-01-01T00:00:00Z",
+  "cigarettesPerDay": 20,
+  "yearsOfSmoking": 15,
+  "costPerPack": 50000,
+  "cigarettesPerPack": 20
+}
+
+### Sau mỗi test case, gọi API này để xem Brinkman Index:
+GET https://localhost:7000/api/SmokingStatus/brinkman-index
+Authorization: Bearer {{token}}
+
+#########################################
+### 9. EXPECTED RESPONSES
+#########################################
+
+### Response mẫu cho Brinkman Index API:
+# {
+#   "accountId": 1,
+#   "accountName": "testuser123",
+#   "cigarettesPerDay": 15,
+#   "yearsOfSmoking": 10,
+#   "brinkmanIndex": 150,
+#   "riskLevel": "Nguy cơ trung bình",
+#   "riskColor": "#ffc107",
+#   "riskDescription": "Chỉ số hút thuốc của bạn ở mức trung bình...",
+#   "percentileRank": 65,
+#   "averageIndexInSystem": 120.5,
+#   "waveData": [
+#     {
+#       "x": 0,
+#       "y": 0.3,
+#       "color": "#28a745",
+#       "label": ""
+#     },
+#     {
+#       "x": 150,
+#       "y": 0.8,
+#       "color": "#ffc107",
+#       "label": "Chỉ số của bạn"
+#     }
+#   ],
+#   "healthRecommendations": [
+#     "BỎ THUỐC NGAY LẬP TỨC - Nguy cơ sức khỏe đang gia tăng",
+#     "Tham khảo ý kiến bác sĩ về kế hoạch cai thuốc phù hợp"
+#   ],
+#   "calculatedAt": "2024-01-15T10:30:00Z"
+# } 
