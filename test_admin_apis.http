@@ -1,0 +1,229 @@
+### ================================
+### ADMIN API TESTING - Smoking Quit Support API
+### ================================
+### Các API thực tế có sẵn trong AdminController
+
+@baseUrl = https://localhost:7000/api
+@adminToken = 
+
+### 1. Đăng nhập Admin để lấy token
+POST {{baseUrl}}/Auth/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "Admin123@"
+}
+
+### Lưu token từ response vào @adminToken ở trên
+
+### ================================
+### QUẢN LÝ TÀI KHOẢN
+### ================================
+
+### 2. Lấy danh sách tất cả tài khoản
+GET {{baseUrl}}/Admin/accounts
+Authorization: Bearer {{adminToken}}
+
+### 3. Thay đổi role của user (User -> Coach)
+PUT {{baseUrl}}/Admin/change-role/2
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "newRole": "Coach"
+}
+
+### 4. Thay đổi role của user (Coach -> User)
+PUT {{baseUrl}}/Admin/change-role/2
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "newRole": "User"
+}
+
+### 5. Xóa tài khoản (không thể xóa Admin)
+DELETE {{baseUrl}}/Admin/accounts/3
+Authorization: Bearer {{adminToken}}
+
+### ================================
+### THỐNG KÊ HỆ THỐNG
+### ================================
+
+### 6. Xem thống kê tổng quan hệ thống
+GET {{baseUrl}}/Admin/statistics
+Authorization: Bearer {{adminToken}}
+
+### 7. Xem hoạt động gần đây
+GET {{baseUrl}}/Admin/recent-activities
+Authorization: Bearer {{adminToken}}
+
+### ================================
+### THỐNG KÊ NÂNG CAO (từ DashboardController)
+### ================================
+
+### 8. Xem thống kê hệ thống chi tiết (có leaderboards)
+GET {{baseUrl}}/Dashboard/system-statistics
+Authorization: Bearer {{adminToken}}
+
+### ================================
+### QUẢN LÝ COACH (từ CoachController)
+### ================================
+
+### 9. Xem danh sách tất cả coaches
+GET {{baseUrl}}/Coach/all-coaches
+Authorization: Bearer {{adminToken}}
+
+### ================================
+### QUẢN LÝ USERS (MỚI THÊM)
+### ================================
+
+### 10. Lấy danh sách users
+GET {{baseUrl}}/Admin/users
+Authorization: Bearer {{adminToken}}
+
+### 11. Xem thông tin chi tiết user
+GET {{baseUrl}}/Admin/users/2
+Authorization: Bearer {{adminToken}}
+
+### 12. Khóa tài khoản user
+PUT {{baseUrl}}/Admin/users/2/block
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "reason": "Vi phạm điều khoản sử dụng",
+  "blockDays": 7
+}
+
+### 13. Mở khóa tài khoản user
+PUT {{baseUrl}}/Admin/users/2/unblock
+Authorization: Bearer {{adminToken}}
+
+### ================================
+### QUẢN LÝ COACHES (MỚI THÊM)
+### ================================
+
+### 14. Lấy danh sách coaches
+GET {{baseUrl}}/Admin/coaches
+Authorization: Bearer {{adminToken}}
+
+### 15. Thêm coach mới
+POST {{baseUrl}}/Admin/coaches
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "username": "newcoach",
+  "email": "newcoach@example.com",
+  "password": "Coach123@",
+  "fullName": "New Coach",
+  "phone": "0987654321",
+  "specialization": "Cai thuốc lá cho người hút nặng",
+  "bio": "5 năm kinh nghiệm hỗ trợ cai thuốc lá"
+}
+
+### 16. Cập nhật thông tin coach
+PUT {{baseUrl}}/Admin/coaches/1
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "specialization": "Cai thuốc lá cho người hút nặng và trung bình",
+  "bio": "7 năm kinh nghiệm hỗ trợ cai thuốc lá",
+  "status": "ACTIVE"
+}
+
+### ================================
+### QUẢN LÝ PACKAGES (MỚI THÊM)
+### ================================
+
+### 17. Lấy danh sách packages
+GET {{baseUrl}}/Admin/packages
+Authorization: Bearer {{adminToken}}
+
+### 18. Thêm package mới
+POST {{baseUrl}}/Admin/packages
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "Premium Plus",
+  "description": "Gói cao cấp với nhiều tính năng hơn",
+  "price": 800000,
+  "durationDays": 90,
+  "features": "Chat không giới hạn, 4 buổi meeting với coach, hỗ trợ 24/7",
+  "isActive": true
+}
+
+### 19. Cập nhật package
+PUT {{baseUrl}}/Admin/packages/2
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "price": 750000,
+  "features": "Chat không giới hạn, 5 buổi meeting với coach, hỗ trợ 24/7",
+  "isActive": true
+}
+
+### ================================
+### THỐNG KÊ CHI TIẾT (MỚI THÊM)
+### ================================
+
+### 20. Thống kê users chi tiết
+GET {{baseUrl}}/Admin/statistics/users
+Authorization: Bearer {{adminToken}}
+
+### 21. Thống kê doanh thu
+GET {{baseUrl}}/Admin/statistics/revenue
+Authorization: Bearer {{adminToken}}
+
+### 22. Thống kê hiệu quả cai thuốc
+GET {{baseUrl}}/Admin/statistics/quit-success
+Authorization: Bearer {{adminToken}}
+
+### ================================
+### GHI CHÚ QUAN TRỌNG
+### ================================
+### 
+### ✅ AdminController hiện tại có đầy đủ 22 endpoints:
+### 
+### QUẢN LÝ TÀI KHOẢN (5 APIs):
+### 1. GET /api/Admin/accounts - Lấy danh sách tài khoản
+### 2. PUT /api/Admin/change-role/{accountId} - Thay đổi role
+### 3. DELETE /api/Admin/accounts/{accountId} - Xóa tài khoản
+### 4. GET /api/Admin/statistics - Thống kê tổng quan
+### 5. GET /api/Admin/recent-activities - Hoạt động gần đây
+###
+### QUẢN LÝ USERS (4 APIs):
+### 6. GET /api/Admin/users - Lấy danh sách users
+### 7. GET /api/Admin/users/{id} - Chi tiết user
+### 8. PUT /api/Admin/users/{id}/block - Khóa user
+### 9. PUT /api/Admin/users/{id}/unblock - Mở khóa user
+###
+### QUẢN LÝ COACHES (3 APIs):
+### 10. GET /api/Admin/coaches - Lấy danh sách coaches
+### 11. POST /api/Admin/coaches - Tạo coach mới
+### 12. PUT /api/Admin/coaches/{id} - Cập nhật coach
+###
+### QUẢN LÝ PACKAGES (3 APIs):
+### 13. GET /api/Admin/packages - Lấy danh sách packages
+### 14. POST /api/Admin/packages - Tạo package mới
+### 15. PUT /api/Admin/packages/{id} - Cập nhật package
+###
+### THỐNG KÊ CHI TIẾT (3 APIs):
+### 16. GET /api/Admin/statistics/users - Thống kê users
+### 17. GET /api/Admin/statistics/revenue - Thống kê doanh thu
+### 18. GET /api/Admin/statistics/quit-success - Thống kê hiệu quả cai thuốc
+###
+### THỐNG KÊ NÂNG CAO (4 APIs từ controllers khác):
+### 19. GET /api/Dashboard/system-statistics - Thống kê hệ thống
+### 20. GET /api/Coach/all-coaches - Danh sách coaches
+###
+### 🎯 CÁCH SỬ DỤNG:
+### 1. Đăng nhập Admin để lấy token
+### 2. Copy token vào biến @adminToken
+### 3. Test từng API theo thứ tự
+### 4. Kiểm tra database để xác nhận thay đổi 
