@@ -1,0 +1,105 @@
+### Test Chat Feature Between Member and Coach ###
+
+### 1. Setup - Create Test Users ###
+
+### Register Member
+POST http://localhost:5000/api/auth/register
+Content-Type: application/json
+
+{
+    "username": "testmember",
+    "email": "member@test.com",
+    "password": "Member123@",
+    "fullName": "Test Member"
+}
+
+### Register Coach
+POST http://localhost:5000/api/auth/register
+Content-Type: application/json
+
+{
+    "username": "testcoach",
+    "email": "coach@test.com", 
+    "password": "Coach123@",
+    "fullName": "Test Coach"
+}
+
+### Login as Admin to update Coach role
+# @name loginAdmin
+POST http://localhost:5000/api/auth/login
+Content-Type: application/json
+
+{
+    "username": "admin",
+    "password": "Admin123@"
+}
+
+### Update Coach Role (using admin token)
+PUT http://localhost:5000/api/admin/accounts/role
+Content-Type: application/json
+Authorization: Bearer {{loginAdmin.response.body.token}}
+
+{
+    "username": "testcoach",
+    "newRole": "Coach"
+}
+
+### 2. Test Member Chat Features ###
+
+### Login as Member
+# @name loginMember
+POST http://localhost:5000/api/auth/login
+Content-Type: application/json
+
+{
+    "username": "testmember",
+    "password": "Member123@"
+}
+
+### Member sends message to Coach
+POST http://localhost:5000/api/premium/chat/send
+Content-Type: application/json
+Authorization: Bearer {{loginMember.response.body.token}}
+
+{
+    "content": "Hello Coach, I need some advice",
+    "messageType": "TEXT"
+}
+
+### Member views chat history
+GET http://localhost:5000/api/premium/chat/history
+Authorization: Bearer {{loginMember.response.body.token}}
+
+### 3. Test Coach Chat Features ###
+
+### Login as Coach
+# @name loginCoach
+POST http://localhost:5000/api/auth/login
+Content-Type: application/json
+
+{
+    "username": "testcoach",
+    "password": "Coach123@"
+}
+
+### Coach views all chats
+GET http://localhost:5000/api/coach/chats
+Authorization: Bearer {{loginCoach.response.body.token}}
+
+### Coach views chat with specific member
+GET http://localhost:5000/api/coach/chats/1
+Authorization: Bearer {{loginCoach.response.body.token}}
+
+### Coach replies to member
+POST http://localhost:5000/api/coach/chats/1/reply
+Content-Type: application/json
+Authorization: Bearer {{loginCoach.response.body.token}}
+
+{
+    "content": "Hello! I'm here to help. What advice do you need?",
+    "messageType": "TEXT"
+}
+
+### Member marks message as read
+PUT http://localhost:5000/api/premium/chat/messages/1/read
+Authorization: Bearer {{loginMember.response.body.token}} 
