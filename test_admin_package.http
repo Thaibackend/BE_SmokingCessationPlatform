@@ -1,0 +1,281 @@
+### TEST ADMIN CREATE PACKAGE - DEBUG MODE
+### Debug các vấn đề có thể xảy ra khi Admin tạo package
+
+@baseUrl = https://localhost:7147/api
+@adminToken = Bearer YOUR_ADMIN_JWT_TOKEN_HERE
+
+### ================================================================
+### BƯỚC 1: TẠO VÀ ĐĂNG NHẬP ADMIN
+### ================================================================
+
+### 1.1 Đăng ký Admin (nếu chưa có)
+POST {{baseUrl}}/Auth/register
+Content-Type: application/json
+
+{
+  "username": "admin001",
+  "email": "admin@smokequit.com",
+  "password": "admin123",
+  "fullName": "System Administrator",
+  "phoneNumber": "0900000001",
+  "dateOfBirth": "1985-01-01T00:00:00.000Z",
+  "cigarettesPerDay": 0,
+  "yearsOfSmoking": 0
+}
+
+### 1.2 Đăng nhập Admin
+POST {{baseUrl}}/Auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@smokequit.com",
+  "password": "admin123"
+}
+# 💡 Copy JWT token và paste vào @adminToken
+
+### ================================================================
+### BƯỚC 2: KIỂM TRA ROLE VÀ ACCESS
+### ================================================================
+
+### 2.1 Kiểm tra có thể access Admin APIs không
+GET {{baseUrl}}/Admin/statistics
+Authorization: {{adminToken}}
+
+### 2.2 Xem packages hiện tại
+GET {{baseUrl}}/Admin/packages
+Authorization: {{adminToken}}
+
+### ================================================================
+### BƯỚC 3: TEST TẠO PACKAGE VỚI CÁC SCENARIO
+### ================================================================
+
+### 3.1 Test tạo package THÀNH CÔNG (Complete data)
+POST {{baseUrl}}/Admin/packages
+Authorization: {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Premium Package",
+  "description": "Gói Premium test với đầy đủ tính năng",
+  "price": 199000,
+  "durationDays": 30,
+  "features": "Coach cá nhân, Chat không giới hạn, Meeting 1:1, Progress tracking chi tiết",
+  "isActive": true
+}
+
+### 3.2 Test tạo package BASIC
+POST {{baseUrl}}/Admin/packages
+Authorization: {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "Basic Package",
+  "description": "Gói cơ bản cho người mới bắt đầu",
+  "price": 0,
+  "durationDays": 30,
+  "features": "Progress tracking cơ bản, Community access",
+  "isActive": true
+}
+
+### 3.3 Test tạo package với GIÁ CAO
+POST {{baseUrl}}/Admin/packages
+Authorization: {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "VIP Package",
+  "description": "Gói VIP với coach chuyên gia",
+  "price": 999000,
+  "durationDays": 90,
+  "features": "Coach chuyên gia, Meeting daily, Progress analysis, Personal plan",
+  "isActive": true
+}
+
+### ================================================================
+### BƯỚC 4: TEST CÁC ERROR CASES
+### ================================================================
+
+### 4.1 Test KHÔNG CÓ TOKEN
+POST {{baseUrl}}/Admin/packages
+Content-Type: application/json
+
+{
+  "name": "No Auth Package",
+  "description": "Test không có auth",
+  "price": 100000,
+  "durationDays": 30,
+  "features": "Test",
+  "isActive": true
+}
+# Expected: 401 Unauthorized
+
+### 4.2 Test TOKEN KHÔNG PHẢI ADMIN (dùng user token)
+POST {{baseUrl}}/Admin/packages
+Authorization: Bearer USER_TOKEN_HERE
+Content-Type: application/json
+
+{
+  "name": "User Try Package",
+  "description": "User thử tạo package",
+  "price": 100000,
+  "durationDays": 30,
+  "features": "Test",
+  "isActive": true
+}
+# Expected: 403 Forbidden
+
+### 4.3 Test DATA THIẾU (Name)
+POST {{baseUrl}}/Admin/packages
+Authorization: {{adminToken}}
+Content-Type: application/json
+
+{
+  "description": "Package thiếu name",
+  "price": 100000,
+  "durationDays": 30,
+  "features": "Test",
+  "isActive": true
+}
+# Expected: 400 Bad Request
+
+### 4.4 Test DATA THIẾU (Price)
+POST {{baseUrl}}/Admin/packages
+Authorization: {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "No Price Package",
+  "description": "Package thiếu price",
+  "durationDays": 30,
+  "features": "Test",
+  "isActive": true
+}
+# Expected: 400 Bad Request
+
+### 4.5 Test DATA THIẾU (DurationDays)
+POST {{baseUrl}}/Admin/packages
+Authorization: {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "No Duration Package",
+  "description": "Package thiếu duration",
+  "price": 100000,
+  "features": "Test",
+  "isActive": true
+}
+# Expected: 400 Bad Request
+
+### 4.6 Test NAME QUÁ DÀI (>200 chars)
+POST {{baseUrl}}/Admin/packages
+Authorization: {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "Package Name Rất Dài Quá 200 Ký Tự Để Test Validation Database Constraint Xem Có Bị Lỗi Hay Không Vì Trong Model MemberPackage StringLength Attribute Giới Hạn 200 Characters Cho Name Field Nên Cần Test Case Này",
+  "description": "Test name quá dài",
+  "price": 100000,
+  "durationDays": 30,
+  "features": "Test",
+  "isActive": true
+}
+# Expected: 400 Bad Request hoặc DB error
+
+### 4.7 Test PRICE ÂM
+POST {{baseUrl}}/Admin/packages
+Authorization: {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "Negative Price Package",
+  "description": "Package với giá âm",
+  "price": -100000,
+  "durationDays": 30,
+  "features": "Test",
+  "isActive": true
+}
+# Expected: Có thể pass hoặc validation error
+
+### 4.8 Test DURATION ÂM
+POST {{baseUrl}}/Admin/packages
+Authorization: {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "Negative Duration Package",
+  "description": "Package với duration âm",
+  "price": 100000,
+  "durationDays": -30,
+  "features": "Test",
+  "isActive": true
+}
+# Expected: Có thể pass hoặc validation error
+
+### ================================================================
+### BƯỚC 5: DEBUG DATABASE CONNECTION
+### ================================================================
+
+### 5.1 Kiểm tra Admin statistics (test DB connection)
+GET {{baseUrl}}/Admin/statistics
+Authorization: {{adminToken}}
+
+### 5.2 Xem all accounts (test DB read)
+GET {{baseUrl}}/Admin/accounts
+Authorization: {{adminToken}}
+
+### 5.3 Thử tạo coach (test DB write khác)
+POST {{baseUrl}}/Admin/coaches
+Authorization: {{adminToken}}
+Content-Type: application/json
+
+{
+  "username": "testcoach",
+  "email": "testcoach@example.com",
+  "password": "coach123",
+  "fullName": "Test Coach",
+  "phone": "0900000002",
+  "specialization": "Smoking Cessation",
+  "bio": "Coach chuyên hỗ trợ cai thuốc lá"
+}
+
+### ================================================================
+### EXPECTED RESULTS & TROUBLESHOOTING
+### ================================================================
+
+# ✅ THÀNH CÔNG:
+# - Status: 200 OK
+# - Response: { "message": "Tạo package thành công", "packageId": X, "name": "..." }
+
+# ❌ CÁC LỖI CÓ THỂ:
+# 
+# 1. 401 Unauthorized:
+#    - Không có token hoặc token invalid
+#    - Solution: Đăng nhập lại, copy token mới
+#
+# 2. 403 Forbidden: 
+#    - Token không phải Admin role
+#    - Solution: Đảm bảo account có role Admin
+#
+# 3. 400 Bad Request - Model validation:
+#    - Name/Price/DurationDays required bị thiếu
+#    - Name > 200 characters
+#    - Solution: Kiểm tra data input
+#
+# 4. 500 Internal Server Error - Database:
+#    - Lỗi "entity changes" = Database connection issue
+#    - Foreign key constraint violation (CreatedById = 1 không tồn tại)
+#    - Solution: Check database, tạo Admin account với ID = 1
+
+### ================================================================
+### SOLUTION CHO LỖI "entity changes"
+### ================================================================
+
+# Nguyên nhân có thể:
+# 1. CreatedById = 1 không tồn tại trong Accounts table
+# 2. Database connection string sai
+# 3. Migration chưa chạy đầy đủ
+
+# Cách fix:
+# 1. Tạo Admin account với ID = 1 trước
+# 2. Hoặc thay CreatedById = actual admin ID
+# 3. Kiểm tra connection string trong appsettings.json 
