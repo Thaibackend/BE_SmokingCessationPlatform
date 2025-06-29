@@ -1,0 +1,143 @@
+### Test Brinkman Index API Endpoints
+### Base URL: https://localhost:7157 (thay đổi theo port của bạn)
+
+### 1. Đăng nhập để lấy token
+POST https://localhost:7157/api/Auth/login
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "password123"
+}
+
+### 2. Tạo/Cập nhật thông tin hút thuốc (với trường YearsOfSmoking mới)
+POST https://localhost:7157/api/SmokingStatus
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "quitDate": "2024-01-01T00:00:00Z",
+  "cigarettesPerDay": 15,
+  "yearsOfSmoking": 10,
+  "costPerPack": 50000,
+  "cigarettesPerPack": 20
+}
+
+### 3. Lấy chỉ số Brinkman Index của người dùng hiện tại
+GET https://localhost:7157/api/SmokingStatus/brinkman-index
+Authorization: Bearer {{token}}
+
+### 4. Lấy thống kê Brinkman Index tổng quan (không cần token)
+GET https://localhost:7157/api/SmokingStatus/brinkman-statistics
+
+### 5. Lấy thông tin smoking status (đã cập nhật với BrinkmanIndex)
+GET https://localhost:7157/api/SmokingStatus/my-status
+Authorization: Bearer {{token}}
+
+### Test Cases khác nhau:
+
+### Test Case 1: Nguy cơ thấp (Brinkman Index < 100)
+POST https://localhost:7157/api/SmokingStatus
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "quitDate": "2024-01-01T00:00:00Z",
+  "cigarettesPerDay": 5,
+  "yearsOfSmoking": 15,
+  "costPerPack": 50000,
+  "cigarettesPerPack": 20
+}
+
+### Test Case 2: Nguy cơ trung bình (Brinkman Index 100-200)
+POST https://localhost:7157/api/SmokingStatus
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "quitDate": "2024-01-01T00:00:00Z",
+  "cigarettesPerDay": 10,
+  "yearsOfSmoking": 15,
+  "costPerPack": 50000,
+  "cigarettesPerPack": 20
+}
+
+### Test Case 3: Nguy cơ cao (Brinkman Index > 200)
+POST https://localhost:7157/api/SmokingStatus
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "quitDate": "2024-01-01T00:00:00Z",
+  "cigarettesPerDay": 20,
+  "yearsOfSmoking": 15,
+  "costPerPack": 50000,
+  "cigarettesPerPack": 20
+}
+
+### Kiểm tra Response Example:
+
+### Expected Response for Brinkman Index:
+# {
+#   "accountId": 1,
+#   "accountName": "user123",
+#   "cigarettesPerDay": 15,
+#   "yearsOfSmoking": 10,
+#   "brinkmanIndex": 150,
+#   "riskLevel": "Nguy cơ trung bình",
+#   "riskColor": "#ffc107",
+#   "riskDescription": "Chỉ số hút thuốc của bạn ở mức trung bình...",
+#   "percentileRank": 65,
+#   "averageIndexInSystem": 120.5,
+#   "waveData": [
+#     {
+#       "x": 0,
+#       "y": 0.3,
+#       "color": "#28a745",
+#       "label": ""
+#     },
+#     {
+#       "x": 150,
+#       "y": 0.8,
+#       "color": "#ffc107",
+#       "label": "Chỉ số của bạn"
+#     }
+#   ],
+#   "healthRecommendations": [
+#     "BỎ THUỐC NGAY LẬP TỨC - Nguy cơ sức khỏe đang gia tăng",
+#     "Tham khảo ý kiến bác sĩ về kế hoạch cai thuốc phù hợp"
+#   ],
+#   "calculatedAt": "2024-01-15T10:30:00Z"
+# }
+
+### Expected Response for Brinkman Statistics:
+# {
+#   "totalUsers": 100,
+#   "lowRiskUsers": 30,
+#   "mediumRiskUsers": 45,
+#   "highRiskUsers": 25,
+#   "averageBrinkmanIndex": 125.5,
+#   "lowRiskPercentage": 30.0,
+#   "mediumRiskPercentage": 45.0,
+#   "highRiskPercentage": 25.0,
+#   "riskDistribution": [
+#     {
+#       "riskLevel": "Nguy cơ thấp",
+#       "count": 30,
+#       "percentage": 30.0,
+#       "color": "#28a745"
+#     },
+#     {
+#       "riskLevel": "Nguy cơ trung bình",
+#       "count": 45,
+#       "percentage": 45.0,
+#       "color": "#ffc107"
+#     },
+#     {
+#       "riskLevel": "Nguy cơ cao",
+#       "count": 25,
+#       "percentage": 25.0,
+#       "color": "#dc3545"
+#     }
+#   ]
+# } 
