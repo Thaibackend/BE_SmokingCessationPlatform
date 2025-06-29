@@ -1,0 +1,194 @@
+### QUICK TEST: UPGRADE TO PREMIUM - SMOKING QUIT SUPPORT API
+### Hướng dẫn test nhanh upgrade Premium mà không cần VNPay thật
+
+@baseUrl = https://localhost:7147/api
+@token = Bearer YOUR_JWT_TOKEN_HERE
+
+### ================================================================
+### BƯỚC 1: ĐĂNG NHẬP (hoặc đăng ký user mới)
+### ================================================================
+
+### 1.1. Đăng ký user mới (nếu chưa có)
+POST {{baseUrl}}/Auth/register
+Content-Type: application/json
+
+{
+  "username": "testuser123",
+  "email": "test@example.com",
+  "password": "password123",
+  "fullName": "Nguyen Van Test",
+  "phoneNumber": "0912345678",
+  "dateOfBirth": "1990-01-01T00:00:00.000Z",
+  "cigarettesPerDay": 10,
+  "yearsOfSmoking": 5
+}
+
+### 1.2. Đăng nhập và copy JWT token
+POST {{baseUrl}}/Auth/login
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "password123"
+}
+
+### ⚠️ QUAN TRỌNG: Copy JWT token từ response và paste vào @token ở đầu file
+
+### ================================================================
+### BƯỚC 2: KIỂM TRA PACKAGE HIỆN TẠI
+### ================================================================
+
+### 2.1. Xem package hiện tại (sẽ là BASIC)
+GET {{baseUrl}}/Package/my-package
+Authorization: {{token}}
+
+### ================================================================
+### BƯỚC 3: UPGRADE LÊN PREMIUM
+### ================================================================
+
+### 3.1. Upgrade với payment method bất kỳ
+POST {{baseUrl}}/Package/upgrade
+Authorization: {{token}}
+Content-Type: application/json
+
+{
+  "targetPackageType": "PREMIUM",
+  "newPackageType": "PREMIUM", 
+  "price": 299000,
+  "durationDays": 30,
+  "paymentMethod": "VNPAY",
+  "paymentReference": "TEST_REF_123"
+}
+
+### 📝 Copy transactionId từ response trên (ví dụ: VP000001202412251649)
+@transactionId = VP000001202412251649
+
+### ================================================================
+### BƯỚC 4: FAKE THANH TOÁN THÀNH CÔNG (MANUAL VERIFICATION)
+### ================================================================
+
+### 4.1. Giả lập thanh toán thành công
+POST {{baseUrl}}/Package/verify-payment/{{transactionId}}
+Authorization: {{token}}
+Content-Type: application/json
+
+{
+  "transactionId": "{{transactionId}}",
+  "paymentMethod": "VNPAY",
+  "amount": 299000,
+  "status": "PAID",
+  "verificationDate": "2024-12-25T16:49:00.000Z",
+  "verificationNotes": "FAKE PAYMENT FOR TESTING - Admin verified"
+}
+
+### ================================================================
+### BƯỚC 5: KIỂM TRA PREMIUM ĐÃ ĐƯỢC KÍCH HOẠT
+### ================================================================
+
+### 5.1. Xem package sau khi upgrade
+GET {{baseUrl}}/Package/my-package
+Authorization: {{token}}
+
+### Kết quả mong đợi:
+### - packageType: "PREMIUM"
+### - status: "ACTIVE" 
+### - isPremium: true
+### - daysRemaining: 30
+
+### ================================================================
+### BƯỚC 6: TEST PREMIUM FEATURES - COACH BOOKING
+### ================================================================
+
+### 6.1. Xem danh sách coaches available
+GET {{baseUrl}}/Premium/coach/available-coaches
+Authorization: {{token}}
+
+### 6.2. Chọn coach đầu tiên (thay 1 bằng coachId thật)
+POST {{baseUrl}}/Premium/coach/assign/1
+Authorization: {{token}}
+
+### 6.3. Xem coach đã được assign
+GET {{baseUrl}}/Premium/coach/my-coach
+Authorization: {{token}}
+
+### 6.4. Book meeting với coach
+POST {{baseUrl}}/Premium/meeting/book
+Authorization: {{token}}
+Content-Type: application/json
+
+{
+  "preferredDate": "2024-12-30T10:00:00.000Z",
+  "meetingType": "INITIAL_CONSULTATION",
+  "notes": "Test booking sau khi upgrade Premium"
+}
+
+### 6.5. Xem meetings đã book
+GET {{baseUrl}}/Premium/meeting/my-meetings
+Authorization: {{token}}
+
+### 6.6. Chat với coach
+POST {{baseUrl}}/Premium/chat/send
+Authorization: {{token}}
+Content-Type: application/json
+
+{
+  "receiverId": 2,
+  "content": "Chào coach, tôi vừa upgrade Premium và muốn được tư vấn",
+  "messageType": "TEXT"
+}
+
+### ================================================================
+### ADMIN VERIFICATION (Nếu cần)
+### ================================================================
+
+### 7.1. Admin xem user statistics
+GET {{baseUrl}}/Admin/statistics/users
+Authorization: {{token}}
+
+### 7.2. Admin xem revenue
+GET {{baseUrl}}/Admin/statistics/revenue
+Authorization: {{token}}
+
+### ================================================================
+### ✅ THÀNH CÔNG! 
+### ================================================================
+
+# Nếu tất cả các bước trên đều return success (200 OK), 
+# nghĩa là user đã:
+# 1. ✅ Upgrade lên Premium thành công
+# 2. ✅ Có thể chọn coach
+# 3. ✅ Book meeting được
+# 4. ✅ Chat với coach được
+# 5. ✅ Sử dụng đầy đủ Premium features
+
+### ================================================================
+### TROUBLESHOOTING
+### ================================================================
+
+### Nếu lỗi "Invalid token":
+# - Đăng nhập lại và copy token mới
+# - Kiểm tra token có "Bearer " ở đầu
+
+### Nếu lỗi "Bạn cần gói Premium":
+# - Kiểm tra payment verification đã thành công chưa
+# - Xem lại package status có ACTIVE không
+
+### Nếu lỗi "Coach không tồn tại":
+# - Tạo coach mới qua Admin API
+# - Hoặc dùng coachId khác
+
+### Nếu không có coach nào:
+# Admin tạo coach mới:
+POST {{baseUrl}}/Admin/coaches
+Authorization: {{token}}
+Content-Type: application/json
+
+{
+  "username": "coach.test",
+  "email": "coach@example.com",
+  "password": "coach123",
+  "fullName": "Dr. Test Coach",
+  "qualifications": "PhD Psychology",
+  "experience": "5 years",
+  "bio": "Test coach for development"
+} 
