@@ -204,6 +204,10 @@ app.MapControllers();
 
 /// <summary>
 /// Tạo database và migrate nếu chưa tồn tại (chỉ trong Development)
+<<<<<<< HEAD
+=======
+/// KHÔNG XÓA DATABASE - chỉ tạo nếu chưa có
+>>>>>>> 647da918bd740fe6d490de8f4a9596e882126310
 /// </summary>
 if (app.Environment.IsDevelopment())
 {
@@ -212,6 +216,7 @@ if (app.Environment.IsDevelopment())
         var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         try
         {
+<<<<<<< HEAD
             // Xóa database cũ và tạo lại với cấu trúc mới
             context.Database.EnsureDeleted();
             context.Database.EnsureCreated();
@@ -224,6 +229,32 @@ if (app.Environment.IsDevelopment())
         catch (Exception ex)
         {
             Console.WriteLine($"❌ Lỗi khi tạo database: {ex.Message}");
+=======
+            // CHỈ tạo database nếu chưa tồn tại (KHÔNG xóa data cũ)
+            var created = context.Database.EnsureCreated();
+            
+            if (created)
+            {
+                Console.WriteLine("✅ Database được tạo mới - đang thêm dữ liệu mẫu...");
+                await SeedData(context);
+                Console.WriteLine("✅ Dữ liệu mẫu đã được tạo!");
+            }
+            else
+            {
+                Console.WriteLine("📊 Database đã tồn tại - giữ nguyên dữ liệu hiện có");
+                
+                // Chỉ thêm dữ liệu mẫu nếu bảng chưa có data
+                if (!context.Achievements.Any())
+                {
+                    await SeedData(context);
+                    Console.WriteLine("✅ Đã thêm dữ liệu mẫu còn thiếu!");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Lỗi khi kiểm tra database: {ex.Message}");
+>>>>>>> 647da918bd740fe6d490de8f4a9596e882126310
         }
     }
 }

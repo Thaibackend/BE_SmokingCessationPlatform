@@ -9,16 +9,25 @@ namespace SmokingQuitSupportAPI.Data
         {
         }
 
+<<<<<<< HEAD
         // DbSets for all entities
         public DbSet<Account> Accounts { get; set; }
         public DbSet<Coach> Coaches { get; set; }
         public DbSet<CoachSession> CoachSessions { get; set; }
+=======
+        // DbSets for all entities - OPTIMIZED (15 tables)
+        public DbSet<Account> Accounts { get; set; }
+        public DbSet<Coach> Coaches { get; set; }
+>>>>>>> 647da918bd740fe6d490de8f4a9596e882126310
         public DbSet<Feedback> Feedbacks { get; set; }
         public DbSet<CommunityPost> CommunityPosts { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<PostLike> PostLikes { get; set; }
         public DbSet<MemberPackage> MemberPackages { get; set; }
+<<<<<<< HEAD
         public DbSet<Order> Orders { get; set; }
+=======
+>>>>>>> 647da918bd740fe6d490de8f4a9596e882126310
         public DbSet<QuitPlan> QuitPlans { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<SmokingStatus> SmokingStatuses { get; set; }
@@ -26,10 +35,16 @@ namespace SmokingQuitSupportAPI.Data
         public DbSet<UserAchievement> UserAchievements { get; set; }
         public DbSet<Progress> ProgressRecords { get; set; }
         
+<<<<<<< HEAD
         // New entities for Package System
         public DbSet<UserSubscription> UserSubscriptions { get; set; }
         public DbSet<ChatMessage> ChatMessages { get; set; }
         public DbSet<QuitStageProgress> QuitStageProgresses { get; set; }
+=======
+        // Enhanced entities (merged functionality)
+        public DbSet<UserSubscription> UserSubscriptions { get; set; } // Merged: Order
+        public DbSet<ChatMessage> ChatMessages { get; set; } // Merged: CoachSession
+>>>>>>> 647da918bd740fe6d490de8f4a9596e882126310
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -56,6 +71,7 @@ namespace SmokingQuitSupportAPI.Data
                 entity.HasIndex(e => e.Status);
             });
 
+<<<<<<< HEAD
             // CoachSession configurations
             modelBuilder.Entity<CoachSession>(entity =>
             {
@@ -74,6 +90,9 @@ namespace SmokingQuitSupportAPI.Data
                 entity.HasIndex(e => e.SessionDate);
                 entity.HasIndex(e => e.Status);
             });
+=======
+
+>>>>>>> 647da918bd740fe6d490de8f4a9596e882126310
 
             // Feedback configurations
             modelBuilder.Entity<Feedback>(entity =>
@@ -83,6 +102,7 @@ namespace SmokingQuitSupportAPI.Data
                     .HasForeignKey(d => d.AccountId)
                     .OnDelete(DeleteBehavior.NoAction);
 
+<<<<<<< HEAD
                 entity.HasOne(d => d.CoachSession)
                     .WithMany(p => p.Feedbacks)
                     .HasForeignKey(d => d.CoachSessionId)
@@ -90,6 +110,15 @@ namespace SmokingQuitSupportAPI.Data
 
                 entity.HasIndex(e => e.AccountId);
                 entity.HasIndex(e => e.CoachSessionId);
+=======
+                entity.HasOne(d => d.RelatedChatMessage)
+                    .WithMany()
+                    .HasForeignKey(d => d.RelatedMessageId)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+                entity.HasIndex(e => e.AccountId);
+                entity.HasIndex(e => e.RelatedMessageId);
+>>>>>>> 647da918bd740fe6d490de8f4a9596e882126310
             });
 
             // CommunityPost configurations
@@ -165,6 +194,7 @@ namespace SmokingQuitSupportAPI.Data
                 entity.HasIndex(e => e.IsActive);
             });
 
+<<<<<<< HEAD
             // Order configurations
             modelBuilder.Entity<Order>(entity =>
             {
@@ -183,6 +213,9 @@ namespace SmokingQuitSupportAPI.Data
                 entity.HasIndex(e => e.Status);
                 entity.HasIndex(e => e.OrderDate);
             });
+=======
+
+>>>>>>> 647da918bd740fe6d490de8f4a9596e882126310
 
             // QuitPlan configurations
             modelBuilder.Entity<QuitPlan>(entity =>
@@ -301,6 +334,7 @@ namespace SmokingQuitSupportAPI.Data
                 entity.HasIndex(e => e.IsRead);
             });
 
+<<<<<<< HEAD
             // QuitStageProgress configurations
             modelBuilder.Entity<QuitStageProgress>(entity =>
             {
@@ -314,6 +348,9 @@ namespace SmokingQuitSupportAPI.Data
                 entity.HasIndex(e => e.StageStartDate);
                 entity.HasIndex(e => e.StageEndDate);
             });
+=======
+
+>>>>>>> 647da918bd740fe6d490de8f4a9596e882126310
         }
     }
 } 

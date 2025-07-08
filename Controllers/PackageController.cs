@@ -65,7 +65,49 @@ namespace SmokingQuitSupportAPI.Controllers
                 return Ok(new
                 {
                     message = "Upgrade package thành công!",
+<<<<<<< HEAD
                     package = upgradedPackage
+=======
+<<<<<<< HEAD
+                    package = upgradedPackage
+=======
+                    package = upgradedPackage,
+                    paymentInfo = new
+                    {
+                        transactionId = upgradedPackage.GetType().GetProperty("TransactionId")?.GetValue(upgradedPackage),
+                        paymentMethod = upgradeDto.PaymentMethod,
+                        amount = upgradeDto.Price,
+                        status = "Processing",
+                        nextSteps = GetPaymentNextSteps(upgradeDto.PaymentMethod)
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Xác nhận thanh toán (cho Admin hoặc automatic payment gateway)
+        /// </summary>
+        /// <param name="transactionId">Transaction ID</param>
+        /// <param name="verificationDto">Thông tin xác nhận</param>
+        /// <returns>Kết quả xác nhận</returns>
+        [HttpPost("verify-payment/{transactionId}")]
+        public async Task<ActionResult> VerifyPayment(string transactionId, [FromBody] PaymentVerificationDto verificationDto)
+        {
+            try
+            {
+                var result = await _packageService.VerifyPaymentAsync(transactionId, verificationDto);
+                
+                return Ok(new
+                {
+                    message = result ? "Thanh toán đã được xác nhận thành công!" : "Xác nhận thanh toán thất bại",
+                    verified = result,
+                    transactionId = transactionId
+>>>>>>> cdacd1ae9bd4395fa5b0559f70fdf933e8b68f20
+>>>>>>> 647da918bd740fe6d490de8f4a9596e882126310
                 });
             }
             catch (Exception ex)
@@ -157,6 +199,54 @@ namespace SmokingQuitSupportAPI.Controllers
         }
 
         /// <summary>
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+        /// Lấy hướng dẫn bước tiếp theo cho từng phương thức thanh toán
+        /// </summary>
+        private List<string> GetPaymentNextSteps(string paymentMethod)
+        {
+            return paymentMethod switch
+            {
+                "BANK_TRANSFER" => new List<string>
+                {
+                    "Chuyển khoản đến số tài khoản: 1234567890 - Ngân hàng ABC",
+                    "Nội dung chuyển khoản: PREMIUM [Transaction ID]",
+                    "Gửi ảnh chụp biên lai để xác nhận thanh toán"
+                },
+                "CREDIT_CARD" or "DEBIT_CARD" => new List<string>
+                {
+                    "Thanh toán đang được xử lý qua cổng thanh toán",
+                    "Bạn sẽ nhận được thông báo kết quả trong vài phút"
+                },
+                "MOMO" => new List<string>
+                {
+                    "Mở ứng dụng MoMo và quét mã QR",
+                    "Hoặc chuyển khoản đến số điện thoại: 0123456789"
+                },
+                "ZALOPAY" => new List<string>
+                {
+                    "Mở ứng dụng ZaloPay và quét mã QR",
+                    "Hoặc sử dụng mã thanh toán được cung cấp"
+                },
+                "VNPAY" => new List<string>
+                {
+                    "Sử dụng ứng dụng ngân hàng hỗ trợ VNPay",
+                    "Quét mã QR hoặc nhập thông tin thanh toán"
+                },
+                "CASH" => new List<string>
+                {
+                    "Đến văn phòng gần nhất để thanh toán",
+                    "Mang theo mã Transaction ID để xác nhận"
+                },
+                _ => new List<string> { "Liên hệ hỗ trợ để được hướng dẫn" }
+            };
+        }
+
+        /// <summary>
+>>>>>>> cdacd1ae9bd4395fa5b0559f70fdf933e8b68f20
+>>>>>>> 647da918bd740fe6d490de8f4a9596e882126310
         /// Lấy AccountId từ JWT token
         /// </summary>
         private int GetCurrentAccountId()

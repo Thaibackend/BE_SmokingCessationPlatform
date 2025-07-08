@@ -1,0 +1,78 @@
+@baseUrl = http://localhost:5000/api
+@token = your_access_token_here
+
+### 1. Đăng ký tài khoản mới (nếu chưa có)
+POST {{baseUrl}}/Auth/register
+Content-Type: application/json
+
+{
+    "username": "testuser",
+    "password": "Test123!@#",
+    "email": "testuser@example.com",
+    "fullName": "Test User",
+    "phoneNumber": "0123456789"
+}
+
+### 2. Đăng nhập để lấy token
+POST {{baseUrl}}/Auth/login
+Content-Type: application/json
+
+{
+    "username": "testuser",
+    "password": "Test123!@#"
+}
+
+### 3. Tạo một bài viết mới để test comment
+# Lưu token từ response đăng nhập vào biến @token
+POST {{baseUrl}}/CommunityPost
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "title": "Bài viết test comment",
+    "content": "Nội dung bài viết để test tính năng bình luận",
+    "category": "Test"
+}
+
+### 4. Lấy danh sách bình luận của bài viết
+# Thay {postId} bằng ID bài viết vừa tạo
+GET {{baseUrl}}/CommunityPost/{postId}/comments
+
+### 5. Tạo bình luận mới
+POST {{baseUrl}}/CommunityPost/{postId}/comments
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "content": "Đây là bình luận đầu tiên",
+    "parentId": null
+}
+
+### 6. Tạo bình luận phản hồi
+POST {{baseUrl}}/CommunityPost/{postId}/comments
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "content": "Đây là phản hồi cho bình luận đầu tiên",
+    "parentId": 1
+}
+
+### 7. Lấy danh sách phản hồi của một bình luận
+GET {{baseUrl}}/CommunityPost/comments/1/replies
+
+### 8. Cập nhật bình luận
+PUT {{baseUrl}}/CommunityPost/comments/1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "content": "Nội dung bình luận đã được cập nhật"
+}
+
+### 9. Xóa bình luận
+DELETE {{baseUrl}}/CommunityPost/comments/2
+Authorization: Bearer {{token}}
+
+### 10. Kiểm tra lại danh sách bình luận sau khi xóa
+GET {{baseUrl}}/CommunityPost/{postId}/comments 
